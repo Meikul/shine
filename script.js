@@ -1,18 +1,24 @@
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 
-
+var aContext = null;
+var gainNode;
+var sound;
+var panner;
 
 const shineImg = document.querySelector('#shine-img');
 let timeout;
 
 document.addEventListener('click', e => {
-  const aContext = new AudioContext();
-  const aElement = document.querySelector('audio');
-  const gainNode = aContext.createGain();
+  aContext = new AudioContext();
+  aElement = document.querySelector('audio');
+  gainNode = aContext.createGain();
   gainNode.gain.value = 0.5;
-  const sound = aContext.createMediaElementSource(aElement);
-  const panner = new StereoPannerNode(aContext, {pan: 0});
+  sound = aContext.createMediaElementSource(aElement);
+  panner = new StereoPannerNode(aContext, {pan: 0});
   sound.connect(panner).connect(gainNode).connect(aContext.destination);
+}, {once: true});
+
+document.addEventListener('click', e => {
   clearTimeout(timeout);
   shineImg.style.left = e.pageX + 'px';
   shineImg.style.top = e.pageY + 'px';
@@ -24,8 +30,10 @@ document.addEventListener('click', e => {
 
   document.body.appendChild(shineImg);
 
-  const panPosition = ((e.pageX / window.innerWidth) - 0.5) * 2;
-  panner.pan.value = panPosition;
-  aElement.play();
-  window.navigator.vibrate(100);
+  if(aContext !== null){
+    const panPosition = ((e.pageX / window.innerWidth) - 0.5) * 2;
+    panner.pan.value = panPosition;
+    aElement.play();
+    window.navigator.vibrate(100);
+  }
 });
