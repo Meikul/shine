@@ -2,15 +2,17 @@ const AudioContext = window.AudioContext || window.webkitAudioContext;
 
 const aContext = new AudioContext();
 const aElement = document.querySelector('audio');
+const gainNode = aContext.createGain();
+gainNode.gain.value = 0.5;
 const sound = aContext.createMediaElementSource(aElement);
 const panner = new StereoPannerNode(aContext, {pan: 0});
-sound.connect(panner).connect(aContext.destination);
 
 
 const shineImg = document.querySelector('#shine-img');
 let timeout;
 
 document.addEventListener('click', e => {
+  sound.connect(panner).connect(gainNode).connect(aContext.destination);
   clearTimeout(timeout);
   shineImg.style.left = e.pageX + 'px';
   shineImg.style.top = e.pageY + 'px';
@@ -25,4 +27,5 @@ document.addEventListener('click', e => {
   const panPosition = ((e.pageX / window.innerWidth) - 0.5) * 2;
   panner.pan.value = panPosition;
   aElement.play();
+  window.navigator.vibrate(100);
 });
